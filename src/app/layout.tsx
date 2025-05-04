@@ -27,6 +27,7 @@ export default function RootLayout({
       <body
         className={`${inter.variable} ${robotoMono.variable} antialiased`}
       >
+      
         {children}
       </body>
     </html>
