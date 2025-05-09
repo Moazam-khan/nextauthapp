@@ -8,10 +8,14 @@ connect();
 export async function POST(request: NextRequest) {
   try {
     const reqBody = await request.json();
-    const { userId, oldPassword, newPassword, confirmNewPassword } = reqBody;
+    const { oldPassword, newPassword, confirmNewPassword } = reqBody;
+
+    // Extract userId from session or token
+
+
 
     // Validate input
-    if (!userId || !oldPassword || !newPassword || !confirmNewPassword) {
+    if (!oldPassword || !newPassword || !confirmNewPassword) {
       return NextResponse.json(
         { error: "All fields are required" },
         { status: 400 }
