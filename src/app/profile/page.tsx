@@ -44,7 +44,12 @@ export default function ProfilePage() {
         className="bg-green-800 mt-4 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
         >GetUser Details</button>
 
-
+    <button
+  onClick={() => router.push("/changepassword")} // Navigate to the changepassword page
+  className="p-2 border border-gray-300 rounded-lg mb-4 focus:outline-none focus:border-red-600"
+>
+  Change Password
+</button>
             </div>
     )
 }
