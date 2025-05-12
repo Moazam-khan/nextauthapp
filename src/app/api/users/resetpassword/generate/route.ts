@@ -38,6 +38,7 @@ export async function POST(request: NextRequest) {
     await sendEmail({
       email: user.email,
       emailType: "RESET",
+      userId: user._id.toString(),
       content: `Your password reset code is: ${verificationCode}`,
     });
     console.log("Email sent");

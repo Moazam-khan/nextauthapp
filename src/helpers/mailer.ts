@@ -1,84 +1,75 @@
-// Import nodemailer for sending emails via SMTP
-import nodemailer from "nodemailer";
+import { Resend } from 'resend';
+import User from '@/models/userModel';
+import crypto from 'crypto';
 
-// Import User model to interact with MongoDB users collection
-import User from "@/models/userModel";
+const resend = new Resend(process.env.RESEND_API_KEY);
 
-// Import crypto for generating random tokens (replacing bcryptjs for URL-safe tokens)
-import crypto from "crypto";
-
-// Define parameter interface for type safety
 interface EmailOptions {
-  email: string; // Recipient's email address
-  emailType: "VERIFY" | "RESET"; // Type of email: verification or password reset
-  userId: string; // MongoDB user _id
-  content?: string; // Optional custom HTML content
+  email: string;
+  emailType: 'VERIFY' | 'RESET';
+  userId: string;
+  username:string
+  content?: string;
 }
 
-// Send email for verification or password reset using Gmail SMTP
-export const sendEmail = async ({ email, emailType, userId, content }: EmailOptions) => {
+export const sendEmail = async ({ email, emailType, userId, content,username }: EmailOptions) => {
   try {
-    // Generate a random, URL-safe token for verification or reset
-    // Uses crypto to create a 32-byte hexadecimal string (secure and suitable for URLs)
-    const token = crypto.randomBytes(32).toString("hex");
+    const token = crypto.randomBytes(32).toString('hex');
 
-    // Update user document in MongoDB based on emailType
-    if (emailType === "VERIFY") {
-      // Store token and 1-hour expiry for email verification
-      // Uses MONGODB_URI to connect to MongoDB Atlas
-      await User.findByIdAndUpdate(userId, {
-        verifyToken: token,
-        verifyTokenExpiry: Date.now() + 3600000, // 1 hour (3600000 ms)
-      });
-    } else if (emailType === "RESET") {
-      // Store token and 1-hour expiry for password reset
-      await User.findByIdAndUpdate(userId, {
-        forgotPasswordToken: token,
-        forgotPasswordTokenExpiry: Date.now() + 3600000, // 1 hour
-      });
-    }
+    // Define the token expiration time
+    const updateFields =
+      emailType === 'VERIFY'
+        ? { verifyToken: token, verifyTokenExpiry: Date.now() + 3600000 }
+        : { forgotPasswordToken: token, forgotPasswordTokenExpiry: Date.now() + 3600000 };
 
-    // Create nodemailer transport for Gmail SMTP
-    const transport = nodemailer.createTransport({
-      host: "smtp.gmail.com", // Gmail SMTP server address
-      port: 587, // Recommended port for TLS (secure and modern)[](https://mailtrap.io/blog/gmail-smtp/)
-      secure: false, // Use TLS (STARTTLS) instead of SSL; secure is true for port 465
-      auth: {
-        user: process.env.EMAIL_USER, // Gmail address from .env (e.g., moazamkhan8999@gmail.com)
-        pass: process.env.EMAIL_PASS, // App Password from .env (not Gmail password)
-      },
+    await User.findByIdAndUpdate(userId, updateFields);
+
+    // Define the email subject
+    const subject = emailType === 'VERIFY' ? 'Please verify your email address' : 'Password reset request';
+
+    // Define HTML email content
+    const defaultHtml = `
+      <div style="font-family: Arial, sans-serif; color: #333;">
+        <h2>${subject}</h2>
+        <p>Hello ${username},</p>
+        <p>Click the link below to ${emailType === 'VERIFY' ? 'verify your email address' : 'reset your password'}:</p>
+        <p>
+          <a href="${process.env.DOMAIN}/${emailType === 'VERIFY' ? 'verifyemail' : 'resetpassword'}?token=${token}"
+             style="background: #4CAF50; color: white; padding: 10px 20px; text-decoration: none; border-radius: 4px;">
+             ${emailType === 'VERIFY' ? 'Verify Email' : 'Reset Password'}
+          </a>
+        </p>
+        <p>If the button doesn't work, copy and paste this URL into your browser:</p>
+        <p style="color: #555;">${process.env.DOMAIN}/${emailType === 'VERIFY' ? 'verifyemail' : 'resetpassword'}?token=${token}</p>
+      </div>
+    `;
+
+    // Define the plain text version of the email content
+    const plainText = `
+      ${subject}
+
+      Hello ${username},
+      
+      Click the link below to ${emailType === 'VERIFY' ? 'verify your email address' : 'reset your password'}:
+      ${process.env.DOMAIN}/${emailType === 'VERIFY' ? 'verifyemail' : 'resetpassword'}?token=${token}
+
+      If the button doesn't work, copy and paste this URL into your browser:
+      ${process.env.DOMAIN}/${emailType === 'VERIFY' ? 'verifyemail' : 'resetpassword'}?token=${token}
+    `;
+
+    // Send the email using Resend API
+    const response = await resend.emails.send({
+      from: process.env.EMAIL_FROM || 'no-reply@yourdomain.com', // Ensure a recognized "From" address
+      to: email,
+      subject,
+      text: plainText, // Send the plain text version
+      html: content || defaultHtml, // Send the HTML version or custom content
     });
 
-    // Define email options (sender, recipient, subject, and HTML content)
-    const mailOptions = {
-      from: process.env.EMAIL_FROM, // Sender email (e.g., moazamkhan8999@gmail.com)
-      to: email, // Recipient email (passed as parameter)
-      subject: 
-        // Set subject based on emailType
-        emailType === "VERIFY" ? "Verify your email" : "Reset your password",
-      html: 
-        // Use custom content or default HTML with a clickable link
-        content || `
-          <p>Click <a href="${process.env.DOMAIN}/${
-            emailType === "VERIFY" ? "verifyemail" : "resetpassword"
-          }?token=${token}">here</a> to ${
-            emailType === "VERIFY" ? "verify your email" : "reset your password"
-          }
-          or copy and paste the link below: <br>
-          ${process.env.DOMAIN}/${
-            emailType === "VERIFY" ? "verifyemail" : "resetpassword"
-          }?token=${token}
-          </p>
-        `,
-    };
-
-    // Send the email using Gmail SMTP and return the response
-    // Response includes message ID and status for debugging
-    const mailResponse = await transport.sendMail(mailOptions);
-    return mailResponse;
+    console.log('Resend email response:', response);
+    return response;
   } catch (error: any) {
-    // Log and rethrow error for debugging (e.g., SMTP failure, MongoDB error)
-    console.error("Email sending failed:", error.message);
-    throw new Error("Failed to send email");
+    console.error('Resend email error:', error.message);
+    throw new Error('Failed to send email via Resend');
   }
 };
