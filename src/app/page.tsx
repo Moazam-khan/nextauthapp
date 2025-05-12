@@ -9,12 +9,12 @@ export default function Home() {
   
 
 
-   <button  className="p-2 border border-gray-300 rounded-lg mb-4 focus:outline-none focus:border-gray-600 text-black">
+   <button  className="p-2 border border-brown-300 rounded-lg mb-4 focus:outline-none focus:border-gray-600 text-black">
     <Link href="/login">
       Login
     </Link>
     </button>
-   <button className="p-2 border border-gray-300 rounded-lg mb-4 focus:outline-none focus:border-gray-600 text-black">
+   <button className="p-2 border border-brown-300 rounded-lg mb-4 focus:outline-none focus:border-gray-600 text-black">
    <Link href="/signup">
     signup
     </Link>
