@@ -1,51 +1,34 @@
-import { connect } from "@/dbConfig/dbConfig";
+// /api/auth/forgot-password.ts
 import { NextRequest, NextResponse } from "next/server";
 import User from "@/models/userModel";
-import { sendEmail } from "@/helpers/mailer";
+import { sendEmail } from "@/helpers/mailer"; // Adjust path if different
 
-connect();
-
-export async function POST(request: NextRequest) {
+export async function POST(req: NextRequest) {
   try {
-    const body = await request.json();
-
-    // Validate that only the email field is provided
-    if (!body.email || typeof body.email !== "string" || Object.keys(body).length !== 1) {
-      return NextResponse.json({ error: "Invalid request format. Only 'email' is allowed." }, { status: 400 });
-    }
-
-    const { email } = body;
-    console.log("Email received:", email);
+    const { email } = await req.json();
 
     const user = await User.findOne({ email });
+
     if (!user) {
-      console.log("User not found");
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    console.log("User found:", user);
-
-    // Generate a 6-digit verification code
-    const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
-    console.log("Generated verification code:", verificationCode);
-
-    user.forgotPasswordToken = verificationCode;
-    user.forgotPasswordTokenExpiry = Date.now() + 3600000; // 1 hour
-    await user.save();
-    console.log("User updated with verification code");
-
-    // Send the verification code via email
     await sendEmail({
       email: user.email,
       emailType: "RESET",
-      userId: user._id.toString(),
-      content: `Your password reset code is: ${verificationCode}`,
+      userId: user._id,
+      username: user.username,
     });
-    console.log("Email sent");
 
-    return NextResponse.json({ message: "Password reset code sent to your email" });
-  } catch (error: any) {
-    console.error("Error in reset password generate route:", error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json(
+      { message: "Password reset email sent" },
+      { status: 200 }
+    );
+  } catch (error) {
+    console.error("Forgot Password Error:", error);
+    return NextResponse.json(
+      { error: "Something went wrong" },
+      { status: 500 }
+    );
   }
 }

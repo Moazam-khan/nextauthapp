@@ -15,9 +15,20 @@ export async function POST(request: NextRequest) {
     // Check if user exists
     const user = await User.findOne({ email });
     if (!user) {
-      return NextResponse.json({ error: "User does not exist" }, { status: 400 });
+      return NextResponse.json(
+        { error: "User does not exist" },
+        { status: 400 }
+      );
     }
     console.log("User exists:", user);
+
+    // Check if the user's email is verified
+    if (!user.isVerfied) {
+      return NextResponse.json(
+        { error: "Email not verified" },
+        { status: 403 }
+      );
+    }
 
     // Check if password is correct
     const validPassword = await bcryptjs.compare(password, user.password);
@@ -34,7 +45,9 @@ export async function POST(request: NextRequest) {
     };
 
     // Create token
-    const token = jwt.sign(tokenData, process.env.TOKEN_SECRET!, { expiresIn: "1d" });
+    const token = jwt.sign(tokenData, process.env.TOKEN_SECRET!, {
+      expiresIn: "1d",
+    });
     console.log("Generated Token:", token);
 
     // Set token in cookies

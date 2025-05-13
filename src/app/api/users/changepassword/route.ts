@@ -53,10 +53,7 @@ export async function POST(request: NextRequest) {
     const user = await User.findById(userId);
 
     if (!user) {
-      return NextResponse.json(
-        { error: "User not found" },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
     // Compare the old password with the stored password
