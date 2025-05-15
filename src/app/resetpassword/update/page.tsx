@@ -29,9 +29,9 @@ const ResetPasswordPage = () => {
       
       toast.success("Password reset successfully!");
       console.log("Response:", response.data);
-    } catch (error: any) {
+    } catch (error) {
       console.error("Error resetting password:", error);
-      toast.error(error.response?.data?.error || "Something went wrong.");
+    
     } finally {
       setLoading(false);
     }

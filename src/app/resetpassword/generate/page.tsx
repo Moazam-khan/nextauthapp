@@ -19,8 +19,9 @@ export default function GenerateResetPage() {
 
       // Redirect to the update password page
       router.push("/resetpassword/update");
-    } catch (err: any) {
-      toast.error(err?.response?.data?.error || "Something went wrong");
+    } catch (err) {
+    console.log(err);
+    
     } finally {
       setLoading(false);
     }

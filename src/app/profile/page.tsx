@@ -5,6 +5,7 @@ import React, { useState } from "react";
 import { toast } from "react-hot-toast";
 import { useRouter } from "next/navigation";
 
+
 export default function ProfilePage() {
   const router = useRouter();
   const [data, setData] = useState("nothing");
@@ -14,16 +15,15 @@ export default function ProfilePage() {
       await axios.get("/api/users/logout");
       toast.success("Logout successful");
       router.push("/login");
-    } catch (error: any) {
-      console.log(error.message);
-      toast.error(error.message);
+    } catch (error) {
+   console.log(error);
+   
     }
   };
 
   const getUserDetails = async () => {
     const res = await axios.get("/api/users/me");
-    console.log(res.data);
-    setData(res.data.data._id);
+    setData((res.data.data._id));
   };
 
   return (
@@ -66,6 +66,8 @@ export default function ProfilePage() {
           >
             Logout
           </button>
+
+          
         </div>
       </div>
     </div>

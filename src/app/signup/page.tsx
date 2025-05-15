@@ -3,7 +3,6 @@ import Link from "next/link";
 import React from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
-import { toast } from "react-hot-toast";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import apiRoutes from "@/lib/api"; // Import the API routes
@@ -37,9 +36,8 @@ export default function SignupPage() {
 
                 // Redirect to verify email page
                 router.push(`/verifyemail?email=${encodeURIComponent(values.email)}`);
-            } catch (error: any) {
-                console.log("Signup failed", error.message);
-                toast.error(error.response?.data?.message || "Signup failed. Please try again.");
+            } catch (error) {
+             console.log(error);
             } finally {
                 setLoading(false);
             }
@@ -119,13 +117,13 @@ export default function SignupPage() {
 
         {/* Navigation Links */}
         <div className="mt-6 text-center text-sm text-gray-600">
-          Already have an account?{" "}
+          Already have an account?
           <Link href="/login" className="text-indigo-600 hover:underline">
             Login
           </Link>
         </div>
         <div className="mt-2 text-center text-sm">
-          Didn't verify email?{" "}
+          Didnt verify email?
           <Link href="/verifyemail" className="text-green-600 hover:underline">
             Go to Email Verification
           </Link>

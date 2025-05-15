@@ -74,8 +74,9 @@ export const sendEmail = async ({
 
     console.log("Resend email response:", response);
     return response;
-  } catch (error: any) {
-    console.error("Resend email error:", error.message);
+  } catch (error) {
+   console.log(error);
+   
     throw new Error("Failed to send email via Resend");
   }
 };
