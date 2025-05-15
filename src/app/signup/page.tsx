@@ -6,6 +6,7 @@ import axios from "axios";
 import { toast } from "react-hot-toast";
 import { useFormik } from "formik";
 import * as Yup from "yup";
+import apiRoutes from "@/lib/api"; // Import the API routes
 
 export default function SignupPage() {
     const router = useRouter();
@@ -27,68 +28,109 @@ export default function SignupPage() {
         onSubmit: async (values) => {
             try {
                 setLoading(true);
-                const response = await axios.post("/api/users/signup", values);
-                console.log("Signup success", response.data);
-                router.push("/login");
+                // Signup API call
+                const signupResponse = await axios.post(apiRoutes.signup, values);
+                console.log("Signup success", signupResponse.data);
+
+                // Show success alert
+                alert("Signup successful! Please verify your email.");
+
+                // Redirect to verify email page
+                router.push(`/verifyemail?email=${encodeURIComponent(values.email)}`);
             } catch (error: any) {
                 console.log("Signup failed", error.message);
-                toast.error(error.message);
+                toast.error(error.response?.data?.message || "Signup failed. Please try again.");
             } finally {
                 setLoading(false);
             }
         },
     });
 
-    return (
-        <div className="flex flex-col items-center justify-center min-h-screen py-2">
-            <h1>{loading ? "Processing" : "Signup"}</h1>
-            <hr />
-            <form onSubmit={formik.handleSubmit} className="flex flex-col items-center">
-                <label htmlFor="username">Username</label>
-                <input
-                    className="p-2 border border-gray-300 rounded-lg mb-4 focus:outline-none focus:border-gray-600 text-black"
-                    id="username"
-                    type="text"
-                    {...formik.getFieldProps("username")}
-                    placeholder="Username"
-                />
-                {formik.touched.username && formik.errors.username ? (
-                    <div className="text-red-500">{formik.errors.username}</div>
-                ) : null}
+   
+  return (
+    <div className="flex items-center justify-center min-h-screen bg-gray-100 px-4">
+      <div className="bg-white shadow-lg rounded-xl w-full max-w-md p-8">
+        <h1 className="text-3xl font-bold text-center text-indigo-600 mb-6">
+          {loading ? "Processing..." : "Create Account"}
+        </h1>
+        <hr className="mb-6 border-gray-300" />
 
-                <label htmlFor="email">Email</label>
-                <input
-                    className="p-2 border border-gray-300 rounded-lg mb-4 focus:outline-none focus:border-gray-600 text-black"
-                    id="email"
-                    type="email"
-                    {...formik.getFieldProps("email")}
-                    placeholder="Email"
-                />
-                {formik.touched.email && formik.errors.email ? (
-                    <div className="text-red-500">{formik.errors.email}</div>
-                ) : null}
+        <form onSubmit={formik.handleSubmit} className="space-y-4">
+          {/* Username */}
+          <div>
+            <label htmlFor="username" className="block font-medium text-gray-700">
+              Username
+            </label>
+            <input
+              id="username"
+              type="text"
+              {...formik.getFieldProps("username")}
+              placeholder="Your username"
+              className="w-full mt-1 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-black"
+            />
+            {formik.touched.username && formik.errors.username && (
+              <p className="text-sm text-red-500 mt-1">{formik.errors.username}</p>
+            )}
+          </div>
 
-                <label htmlFor="password">Password</label>
-                <input
-                    className="p-2 border border-gray-300 rounded-lg mb-4 focus:outline-none focus:border-gray-600 text-black"
-                    id="password"
-                    type="password"
-                    {...formik.getFieldProps("password")}
-                    placeholder="Password"
-                />
-                {formik.touched.password && formik.errors.password ? (
-                    <div className="text-red-500">{formik.errors.password}</div>
-                ) : null}
+          {/* Email */}
+          <div>
+            <label htmlFor="email" className="block font-medium text-gray-700">
+              Email
+            </label>
+            <input
+              id="email"
+              type="email"
+              {...formik.getFieldProps("email")}
+              placeholder="you@example.com"
+              className="w-full mt-1 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-black"
+            />
+            {formik.touched.email && formik.errors.email && (
+              <p className="text-sm text-red-500 mt-1">{formik.errors.email}</p>
+            )}
+          </div>
 
-                <button
-                    type="submit"
-                    disabled={loading || !formik.isValid}
-                    className="p-2 border border-gray-300 rounded-lg mb-4 focus:outline-none focus:border-gray-600"
-                >
-                    {loading ? "Processing..." : "Signup"}
-                </button>
-            </form>
-            <Link href="/login">Visit login page</Link>
+          {/* Password */}
+          <div>
+            <label htmlFor="password" className="block font-medium text-gray-700">
+              Password
+            </label>
+            <input
+              id="password"
+              type="password"
+              {...formik.getFieldProps("password")}
+              placeholder="Create a strong password"
+              className="w-full mt-1 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-black"
+            />
+            {formik.touched.password && formik.errors.password && (
+              <p className="text-sm text-red-500 mt-1">{formik.errors.password}</p>
+            )}
+          </div>
+
+          {/* Submit Button */}
+          <button
+            type="submit"
+            disabled={loading || !formik.isValid}
+            className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 rounded-lg transition duration-200 disabled:opacity-50"
+          >
+            {loading ? "Processing..." : "Sign Up"}
+          </button>
+        </form>
+
+        {/* Navigation Links */}
+        <div className="mt-6 text-center text-sm text-gray-600">
+          Already have an account?{" "}
+          <Link href="/login" className="text-indigo-600 hover:underline">
+            Login
+          </Link>
         </div>
-    );
+        <div className="mt-2 text-center text-sm">
+          Didn't verify email?{" "}
+          <Link href="/verifyemail" className="text-green-600 hover:underline">
+            Go to Email Verification
+          </Link>
+        </div>
+      </div>
+    </div>
+  );
 }

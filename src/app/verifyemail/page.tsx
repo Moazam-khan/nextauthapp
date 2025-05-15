@@ -1,61 +1,74 @@
 "use client";
 
 import axios from "axios";
+import { useRouter } from "next/navigation";
+import React, { useState } from "react";
+import apiRoutes from "@/lib/api"; // Import the API routes
 import Link from "next/link";
-import React, { useEffect, useState } from "react";
 
 
 export default function VerifyEmailPage() {
-
     const [token, setToken] = useState("");
     const [verified, setVerified] = useState(false);
     const [error, setError] = useState(false);
+    const router = useRouter();
 
     const verifyUserEmail = async () => {
         try {
-            await axios.post('/api/users/verifyemail', {token})
+            // Call the verify email API using the imported route
+            await axios.post(apiRoutes.verifyEmail, { token });
             setVerified(true);
-        } catch (error:any) {
+            setError(false);
+
+            // Redirect to login page after success
+            setTimeout(() => {
+                router.push("/profile");
+            }, 2000); // Redirect after 2 seconds
+        } catch (error: any) {
+            setVerified(false);
             setError(true);
-            console.log(error.reponse.data);
-            
+            console.error("Verification failed:", error.response?.data || error.message);
         }
+    };
 
-    }
-
-    useEffect(() => {
-        const urlToken = window.location.search.split("=")[1];
-        setToken(urlToken || "");
-    }, []);
-
-
-    useEffect(() => {
-        if(token.length > 0) {
-            verifyUserEmail();
-        }
-    }, [token]);
-
-    return(
+    return (
         <div className="flex flex-col items-center justify-center min-h-screen py-2">
-
             <h1 className="text-4xl">Verify Email</h1>
-            <h2 className="p-2 bg-orange-500 text-black">{token ? `${token}` : "no token"}</h2>
+            <p className="text-gray-700 mb-4">Please paste the token you received via email below:</p>
 
+            <input
+                type="text"
+                value={token}
+                onChange={(e) => setToken(e.target.value)}
+                placeholder="Enter your token"
+                className="p-2 border border-gray-300 rounded-lg mb-4 focus:outline-none focus:border-gray-600 text-black w-80"
+            />
+
+            <button
+                onClick={verifyUserEmail}
+                className="p-2 bg-blue-500 text-white rounded-lg mb-4 focus:outline-none hover:bg-blue-600"
+            >
+                Verify
+            </button>
+             <p className="mt-4">
+      {" "}
+        <Link href="/login" className="text-blue-500 hover:underline">
+         LOGIN
+        </Link>
+      </p>
             {verified && (
                 <div>
-                    <h2 className="text-2xl">Email Verified</h2>
-                    <Link href="/login">
-                        Login
-                    </Link>
+                    <h2 className="text-2xl text-green-500">Email Verified Successfully!</h2>
+                    <p className="text-gray-700">Redirecting to login page...</p>
                 </div>
             )}
+
             {error && (
                 <div>
-                    <h2 className="text-2xl bg-red-500 text-black">Error</h2>
-                    
+                    <h2 className="text-2xl bg-red-500 text-black">Verification Failed</h2>
+                    <p className="text-gray-700">Invalid token. Please try again.</p>
                 </div>
             )}
         </div>
-    )
-
+    );
 }

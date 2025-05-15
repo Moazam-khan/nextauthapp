@@ -6,14 +6,15 @@ export function middleware(request: NextRequest) {
 
   // Define public paths (accessible without authentication)
   const isPublicPath =
-    path === "/" || path === "/login" || path === "/signup" || path === "/verifyemail";
+    path === "/" || path === "/login" || path === "/signup" || path === "/verifyemail" || path === "/resetpassword/generate" || path === "/resetpassword/update";
 
   // Get the token from cookies
   const token = request.cookies.get("token")?.value || "";
 
   // Redirect authenticated users away from public paths (e.g., login, signup)
   if (isPublicPath && token) {
-    return NextResponse.redirect(new URL("/profile", request.nextUrl)); // Redirect to profile if authenticated
+    return NextResponse.redirect(new URL("/profile", request.nextUrl));
+     // Redirect to profile if authenticated
   }
 
   // Redirect unauthenticated users away from private paths (e.g., profile, changepassword)

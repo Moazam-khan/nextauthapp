@@ -1,14 +1,14 @@
-const baseUrl = "http://localhost:3000/api";
+const baseUrl = "http://localhost:3000/api/";
 
 const apiRoutes = {
-  signup: `${baseUrl}/signup`,
-  verifyEmail: `${baseUrl}/verifyemail`,
-  login: `${baseUrl}/login`,
-  logout: `${baseUrl}/logout`,
-  changePassword: `${baseUrl}/changepassword`,
+  signup: `${baseUrl}/users/signup`,
+  verifyEmail: `${baseUrl}/users/verifyemail`,
+  login: `${baseUrl}/users/login`,
+  logout: `${baseUrl}/users/logout`,
+  changePassword: `${baseUrl}/users/changepassword`,
   resetPassword: {
-    generate: `${baseUrl}/resetpassword/generate`,
-    update: `${baseUrl}/resetpassword/update`,
+    generate: `${baseUrl}/users/resetpassword/generate`,
+    update: `${baseUrl}/users/resetpassword/update`,
   },
 };
 
