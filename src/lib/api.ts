@@ -1,4 +1,4 @@
-const baseUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/api/`;
+const baseUrl = `http://localhost:3000/api/`;
 
 const apiRoutes = {
   signup: `${baseUrl}/users/signup`,
