@@ -80,6 +80,13 @@ export default function LoginPage() {
           Sign up
         </Link>
       </p>
+       <p className="mt-4">
+        Forget Password click on to Recover{" "}
+        <Link href="/resetpassword/generate" className="text-blue-500 hover:underline">
+          Forget Password
+        </Link>
+        
+      </p>
     </div>
   );
 }
