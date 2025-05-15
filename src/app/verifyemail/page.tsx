@@ -24,10 +24,10 @@ export default function VerifyEmailPage() {
             setTimeout(() => {
                 router.push("/profile");
             }, 2000); // Redirect after 2 seconds
-        } catch (error: any) {
+        } catch (error) {
             setVerified(false);
             setError(true);
-            console.error("Verification failed:", error.response?.data || error.message);
+            console.error("Error verifying email:", error);
         }
     };
 
@@ -51,7 +51,7 @@ export default function VerifyEmailPage() {
                 Verify
             </button>
              <p className="mt-4">
-      {" "}
+    
         <Link href="/login" className="text-blue-500 hover:underline">
          LOGIN
         </Link>

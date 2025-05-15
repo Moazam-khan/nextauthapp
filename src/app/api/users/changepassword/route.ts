@@ -5,7 +5,9 @@ import bcryptjs from "bcryptjs";
 import jwt from "jsonwebtoken";
 
 connect();
-
+   interface TokenPayload {
+        id: string;
+      }
 export async function POST(request: NextRequest) {
   try {
     const reqBody = await request.json();
@@ -25,7 +27,8 @@ export async function POST(request: NextRequest) {
       // Verify and decode the token
       const decoded = jwt.verify(token, process.env.TOKEN_SECRET!);
       console.log("Decoded Token:", decoded);
-      userId = (decoded as any).id; // Extract user ID from the token payload
+   
+      userId = (decoded as TokenPayload).id; // Extract user ID from the token payload
     } catch (error) {
       console.error("Token Verification Error:", error);
       return NextResponse.json(
@@ -78,8 +81,8 @@ export async function POST(request: NextRequest) {
       message: "Password changed successfully",
       success: true,
     });
-  } catch (error: any) {
+  } catch (error) {
     console.error("Error in changepassword route:", error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error }, { status: 500 });
   }
 }

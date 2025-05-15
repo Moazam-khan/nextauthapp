@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
-import { toast } from "react-hot-toast";
+
 import Link from "next/link";
 
 export default function LoginPage() {
@@ -31,14 +31,14 @@ export default function LoginPage() {
       const token = response.data.token;
       if (token) {
         localStorage.setItem("token", token);
-        toast.success("Login successful!");
+       
         router.push("/profile");
       } else {
-        toast.error("Token missing in response");
+        console.error("No token received");
       }
-    } catch (error: any) {
-      console.error("Login error:", error);
-      toast.error(error?.response?.data?.error || "Login failed");
+    } catch (error) {
+    
+   console.log(error);
     } finally {
       setLoading(false);
     }
@@ -75,13 +75,13 @@ export default function LoginPage() {
       </button>
 
       <p className="mt-4">
-        Don't have an account?{" "}
+        Dont have an account?
         <Link href="/signup" className="text-blue-500 hover:underline">
           Sign up
         </Link>
       </p>
        <p className="mt-4">
-        Forget Password click on to Recover{" "}
+        Forget Password click on to Recover
         <Link href="/resetpassword/generate" className="text-blue-500 hover:underline">
           Forget Password
         </Link>

@@ -2,8 +2,9 @@
 import React from "react";
 import axios from "axios";
 import { toast } from "react-hot-toast";
-import { Formik, Form, Field, ErrorMessage } from "formik";
+import { Formik, Form, Field, ErrorMessage, FormikHelpers } from "formik";
 import * as Yup from "yup";
+import Link from "next/link";
 
 const validationSchema = Yup.object({
   oldPassword: Yup.string()
@@ -24,7 +25,7 @@ const initialValues = {
 };
 
 const ChangePassword = () => {
-  const handleSubmit = async (values: typeof initialValues, actions: any) => {
+  const handleSubmit = async (values: typeof initialValues, actions: FormikHelpers<typeof initialValues>) => {
     const token = localStorage.getItem("token");
 
     if (!token) {
@@ -44,15 +45,16 @@ const ChangePassword = () => {
       );
       toast.success(res.data.message || "Password changed successfully");
       actions.resetForm();
-    } catch (error: any) {
-      toast.error(error.response?.data?.error || "Failed to change password");
+    } catch (error) {
+      console.log(error);
+
     } finally {
       actions.setSubmitting(false);
     }
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gray-100 p-4">
+    <div className="flex flex-row justify-center items-center min-h-screen bg-gray-100 p-4">
       <div className="w-full max-w-md bg-white p-6 rounded-lg shadow-md">
         <h2 className="text-2xl font-semibold text-center mb-6">
           Change Password
@@ -120,7 +122,14 @@ const ChangePassword = () => {
             </Form>
           )}
         </Formik>
+        <div className="flex flex-col items-center mt-4 bg-blue-200">
+        <button> <Link href="/profile" className="text-blue-500 hover:underline">
+          Back to Profile
+        </Link></button>
       </div>
+      </div>
+     
+      
     </div>
   );
 };
