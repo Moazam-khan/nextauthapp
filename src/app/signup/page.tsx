@@ -6,6 +6,7 @@ import axios from "axios";
 import { toast } from "react-hot-toast";
 import { useFormik } from "formik";
 import * as Yup from "yup";
+import apiRoutes from "@/lib/api"; // Import the API routes
 
 export default function SignupPage() {
     const router = useRouter();
@@ -27,12 +28,18 @@ export default function SignupPage() {
         onSubmit: async (values) => {
             try {
                 setLoading(true);
-                const response = await axios.post("/api/users/signup", values);
-                console.log("Signup success", response.data);
-                router.push("/login");
+                // Signup API call
+                const signupResponse = await axios.post(apiRoutes.signup, values);
+                console.log("Signup success", signupResponse.data);
+
+                // Show success alert
+                alert("Signup successful! Please verify your email.");
+                
+                // Redirect to verify email page
+                router.push(`/verifyemail?email=${encodeURIComponent(values.email)}`);
             } catch (error: any) {
                 console.log("Signup failed", error.message);
-                toast.error(error.message);
+                toast.error(error.response?.data?.message || "Signup failed. Please try again.");
             } finally {
                 setLoading(false);
             }
@@ -88,7 +95,10 @@ export default function SignupPage() {
                     {loading ? "Processing..." : "Signup"}
                 </button>
             </form>
-            <Link href="/login">Visit login page</Link>
+            <br />
+            <Link href="/login" className="text-red-500">Visit login page</Link>
+            <br />
+            <Link href="/verifyemail" className="text-green-500">Go to Verify Email Page</Link>
         </div>
     );
 }
