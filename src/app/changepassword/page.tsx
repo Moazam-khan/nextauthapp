@@ -5,6 +5,7 @@ import { toast } from "react-hot-toast";
 import { Formik, Form, Field, ErrorMessage, FormikHelpers } from "formik";
 import * as Yup from "yup";
 import Link from "next/link";
+import apiRoutes from "@/lib/api";
 
 const validationSchema = Yup.object({
   oldPassword: Yup.string()
@@ -35,7 +36,7 @@ const ChangePassword = () => {
 
     try {
       const res = await axios.post(
-        "/api/users/changepassword",
+        apiRoutes.changePassword,
         values,
         {
           headers: {

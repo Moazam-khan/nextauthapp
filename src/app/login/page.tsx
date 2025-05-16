@@ -3,8 +3,8 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
-
 import Link from "next/link";
+import apiRoutes from "@/lib/api";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -25,7 +25,7 @@ export default function LoginPage() {
   const onLogin = async () => {
     try {
       setLoading(true);
-      const response = await axios.post("/api/users/login", user);
+      const response = await axios.post(apiRoutes.login, user);
 
       // ✅ Save token to localStorage
       const token = response.data.token;

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, Roboto_Mono } from "next/font/google";
 import "./globals.css";
+import Link from "next/link";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -27,7 +28,11 @@ export default function RootLayout({
       <body
         className={`${inter.variable} ${robotoMono.variable} antialiased`}
       >
-      
+      <Link href="/">
+            <button className="w-full px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition">
+              Home Page
+            </button>
+          </Link>
         {children}
       </body>
     </html>
